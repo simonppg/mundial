@@ -1,32 +1,24 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
 var people = JSON.parse('{"people":[]}');
 
-var parserConfig = {
-  step: function(row) {
-    //console.log("Row:", row.data);
-  },
-  complete: function() {
-    console.log("All done!");
-  }
-}
-
 function processData(csvString) {
-  var results = Papa.parse(csvString, parserConfig);
+  var results = Papa.parse(csvString);
+  people['people'].push({person: this, data: results.data});
 }
 
 var getForecast = {
-    type: "GET",
-    dataType: "text",
-    success: function(data) {processData(data);}
+  type: "GET",
+  dataType: "text",
 }
 
 function fillFilesNames(data) {
   var lines = data.split('\n');
-  for(var i = 0; i < lines.length; i++){
+  for(var i = 0; i < lines.length - 1; i++){
     var person = new Object();
     person.name = lines[i];
-    people['people'].push(person);
-    getForecast.url = URL_PATH.concat(lines[0]).concat(".csv"),
+    getForecast.url = URL_PATH.concat(lines[i]).concat(".csv");
+    getForecast.success = processData;
+    getForecast.context = person;
     $.ajax(getForecast)
   }
   console.log(people);
