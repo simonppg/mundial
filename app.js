@@ -1,5 +1,6 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
 var people = JSON.parse('{"players":[], "total": -1, "completed": 0, "results": 0}');
+var myTable = $('#myTable').DataTable();
 
 function mapper(a){
   var myObj = new Object();
@@ -8,14 +9,10 @@ function mapper(a){
 }
 
 function addPlayer(playerName, points) {
-  var rowCount = $('#myTable tr').length;
-  var table = document.getElementById("myTable");
-  var row = table.insertRow(rowCount);
-  var cell1 = row.insertCell(0);
-  var cell2 = row.insertCell(1);
-  cell1.innerHTML = playerName;
-  cell2.innerHTML = points;
-  //console.log("Adding player: "+playerName+" on row: "+rowCount);
+  myTable.row.add([
+    playerName,
+    points
+  ]).draw( false );
 }
 
 function getResults(csvString) {
