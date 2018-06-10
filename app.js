@@ -26,23 +26,27 @@ function getResults(csvString) {
   people.results = Object.assign({}, ...people.results);
 
   for (var match in people.results) {
-    console.log(match);
+    console.log("Result of "+match+" is: "+people.results[match]);
     for(var j = 0; j < people.players.length; j++){
-      console.log(people.results[match]);
-      console.log(people.players[j].data[match]);
+      console.log(people.players[j].name+" said: "+people.players[j].data[match]);
       if(people.results[match].toUpperCase() === people.players[j].data[match].toUpperCase())
       {
-        console.log("Point for: "+people.players[j].name);
-        addPlayer(people.players[j].name, 0);
+        console.log('%cOne point for '+people.players[j].name+'!', 'color: #ff0000');
+        people.players[j].points++;
+        //addPlayer(people.players[j].name, 0);
       }
     }
+  }
+
+  for(var j = 0; j < people.players.length; j++){
+    addPlayer(people.players[j].name, people.players[j].points);
   }
 }
 
 function processData(csvString) {
   var playerData = Papa.parse(csvString);
   playerData.data = playerData.data.map(mapper);
-  people.players.push({name: this.name, data: playerData.data});
+  people.players.push({name: this.name, data: playerData.data, points: 0});
   people.completed++;
 
   if(people.total == people.completed)
