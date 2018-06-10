@@ -1,6 +1,10 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
 var people = JSON.parse('{"players":[], "total": -1, "completed": 0, "results": 0}');
-var myTable = $('#myTable').DataTable();
+var myTable = $('#myTable').DataTable({
+  searching: false,
+  paging: false,
+  info: false
+});
 
 function mapper(a){
   var myObj = new Object();
