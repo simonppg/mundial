@@ -34,7 +34,6 @@ function getResults(csvString) {
       {
         console.log('%cOne point for '+people.players[j].name+'!', 'color: #ff0000');
         people.players[j].points++;
-        //addPlayer(people.players[j].name, 0);
       }
     }
   }
