@@ -1,0 +1,34 @@
+
+body{
+	font-family: sans-serif;
+	/*background-image: url(https://desktop.github.com/images/star-bg.svg),linear-gradient(#191c20, #24292e 15%);
+	background: #0f4583 url(https://www.fifa.com/assets/img/tournaments/17/2018/common/fwc_darkbluebg.png) repeat;*/
+}
+
+.group{
+	border: 1px solid #bbbbbb;
+	background-color:#ffffff;
+}
+
+.table thead th{
+	border: none;
+	padding:10px 8px;
+}
+
+.table tbody td{
+	padding:10px 8px;
+}
+
+.group-name{
+	display: block;
+	width:100%;
+	background-color: #363636;
+	color: white;
+	padding:5px 8px;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.banner{
+
+}
