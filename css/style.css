@@ -12,11 +12,13 @@ body{
 
 .table thead th{
 	border: none;
-	padding:10px 8px;
+	padding:5px 8px;
+	font-size: 12px;
 }
 
 .table tbody td{
 	padding:10px 8px;
+	font-size: 15px;
 }
 
 .group-name{
@@ -29,6 +31,7 @@ body{
 	font-size: 18px;
 }
 
-.banner{
-
+.flag{
+	width: 32px;
+	margin: 0 4px;
 }
