@@ -19,12 +19,20 @@ function addPlayer(playerName, points) {
   ]).draw( false );
 }
 
+function addResults(results) {
+  $.each(results, function(match, result) {
+    var span = $("#"+match.replace(/\s/g, ''));
+    span.text(result);
+  });
+}
+
 function getResults(csvString) {
   var matchResults = Papa.parse(csvString);
   matchResults.data.splice(-1,1);
   matchResults.data.splice(0,1);
   people.results = matchResults.data.map(mapper);
   people.results = Object.assign({}, ...people.results);
+  addResults(people.results);
 
   for (var match in people.results) {
     console.log("Result of "+match+" is: "+people.results[match]);
