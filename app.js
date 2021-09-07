@@ -1,6 +1,6 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-var people = JSON.parse('{"completed": 0}');
 let players = [];
+let completed = 0;
 var myTable = $('#myTable').DataTable({
   searching: false,
   paging: false,
@@ -56,9 +56,9 @@ function processData(numberOfPlayers, person, csvString) {
   var playerData = Papa.parse(csvString);
   playerData.data = playerData.data.map(mapper);
   players.push({name: person.name, data: playerData.data, points: 0});
-  people.completed++;
+  completed++;
 
-  if(numberOfPlayers == people.completed)
+  if(numberOfPlayers == completed)
   {
     for(var j = 0; j < players.length; j++){
       players[j].data.splice(-1,1);
@@ -82,8 +82,6 @@ async function fillFilesNames(filesNames) {
     person.name = fileName;
     processData(numberOfPlayers, person, csv)
   })
-
-  console.log(people);
 }
 
 /**
