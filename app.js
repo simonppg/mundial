@@ -1,5 +1,5 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-var people = JSON.parse('{"players":[], "completed": 0, "results": 0}');
+var people = JSON.parse('{"players":[], "completed": 0}');
 var myTable = $('#myTable').DataTable({
   searching: false,
   paging: false,
@@ -27,18 +27,19 @@ function addResults(results) {
 }
 
 function getResults(csvString) {
-  var matchResults = Papa.parse(csvString);
-  matchResults.data.splice(-1,1);
-  matchResults.data.splice(0,1);
-  people.results = matchResults.data.map(mapper);
-  people.results = Object.assign({}, ...people.results);
-  addResults(people.results);
+  const parserResult = Papa.parse(csvString);
+  parserResult.data.splice(-1,1);
+  parserResult.data.splice(0,1);
 
-  for (var match in people.results) {
-    console.log("Result of " + match + " is: " + people.results[match]);
+  let matchesResults = parserResult.data.map(mapper);
+  matchesResults = Object.assign({}, ...matchesResults);
+  addResults(matchesResults);
+
+  for (let match in matchesResults) {
+    console.log("Result of " + match + " is: " + matchesResults[match]);
     people.players.forEach((player) => {
       console.log(player.name + " said: " + player.data[match]);
-      if(people.results[match].toUpperCase() === player.data[match].toUpperCase()) {
+      if(matchesResults[match].toUpperCase() === player.data[match].toUpperCase()) {
         console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
         player.points++;
       }
