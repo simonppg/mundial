@@ -64,10 +64,10 @@ function processData(csvString) {
       people.players[j].data.splice(0,1);
       people.players[j].data = Object.assign({}, ...people.players[j].data);
     }
-    // Get matches results
-    ajaxConfig.url = URL_PATH.concat("results.csv");
-    ajaxConfig.success = getResults;
-    $.ajax(ajaxConfig);
+
+    retriveMatchesResults().then((matchesResults) => {
+      getResults(matchesResults)
+    });
   }
 }
 
@@ -88,6 +88,19 @@ function fillFilesNames(filesNames) {
 
   people.total = filesNames.length - 1;
   console.log(people);
+}
+
+/**
+ * @returns matchesResults final results
+ * */
+async function retriveMatchesResults() {
+  const res = await fetch(URL_PATH + "results.csv");
+
+  if(!res.ok) { return Promise.reject("Can not get results.csv") }
+
+  const matchesResults = await res.text();
+  // console.log(matchesResults);
+  return matchesResults;
 }
 
 /**
