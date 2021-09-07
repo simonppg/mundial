@@ -76,18 +76,19 @@ var ajaxConfig = {
   dataType: "text",
 }
 
-function fillFilesNames(data) {
-  var lines = data.split('\n');
-  for(var i = 0; i < lines.length - 1; i++){
-    var person = new Object();
-    person.name = lines[i];
-    ajaxConfig.url = URL_PATH.concat(lines[i]).concat(".csv");
+function fillFilesNames(filesNamesStr) {
+  let filesNames = filesNamesStr.split('\n');
+
+  for(let i = 0; i < filesNames.length - 1; i++) {
+    let person = new Object();
+    person.name = filesNames[i];
+    ajaxConfig.url = URL_PATH.concat(filesNames[i]).concat(".csv");
     ajaxConfig.success = processData;
     ajaxConfig.context = person;
     $.ajax(ajaxConfig)
   }
 
-  people.total = lines.length - 1;
+  people.total = filesNames.length - 1;
   console.log(people);
 }
 
