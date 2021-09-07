@@ -92,13 +92,22 @@ function fillFilesNames(filesNamesStr) {
   console.log(people);
 }
 
-var main = function() {
-  $.ajax({
-    type: "GET",
-    url: URL_PATH.concat("files_names.txt"),
-    dataType: "text",
-    success: fillFilesNames
-  });
+async function retriveFilesNames() {
+  const res = await fetch(URL_PATH + "files_names.txt");
+
+  if(!res.ok) { return Promise.reject("Can not get files_names")}
+
+  const filesNames = await res.text();
+
+  return filesNames;
+}
+
+var main = async function() {
+  const filesNames = await retriveFilesNames();
+
+  console.log(filesNames);
+
+  fillFilesNames(filesNames);
 }
 
 $(document).ready(main);
