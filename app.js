@@ -84,6 +84,16 @@ async function fillFilesNames(filesNames) {
   })
 }
 
+function parseCsv(csvStr){
+  const parsedData = Papa.parse(csvStr);
+
+  if(parsedData.errors.length > 0) {
+    throw new Error("Can not parse csv")
+  }
+
+  return parsedData.data;
+}
+
 /**
  * @returns matchesResults final results
  * */
