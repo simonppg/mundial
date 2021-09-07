@@ -1,5 +1,6 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-var people = JSON.parse('{"players":[], "completed": 0}');
+var people = JSON.parse('{"completed": 0}');
+let players = [];
 var myTable = $('#myTable').DataTable({
   searching: false,
   paging: false,
@@ -37,7 +38,7 @@ function getResults(csvString) {
 
   for (let match in matchesResults) {
     console.log("Result of " + match + " is: " + matchesResults[match]);
-    people.players.forEach((player) => {
+    players.forEach((player) => {
       console.log(player.name + " said: " + player.data[match]);
       if(matchesResults[match].toUpperCase() === player.data[match].toUpperCase()) {
         console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
@@ -46,7 +47,7 @@ function getResults(csvString) {
     })
   }
 
-  people.players.forEach((player) => {
+  players.forEach((player) => {
     addPlayer(player.name, player.points);
   })
 }
@@ -54,15 +55,15 @@ function getResults(csvString) {
 function processData(numberOfPlayers, person, csvString) {
   var playerData = Papa.parse(csvString);
   playerData.data = playerData.data.map(mapper);
-  people.players.push({name: person.name, data: playerData.data, points: 0});
+  players.push({name: person.name, data: playerData.data, points: 0});
   people.completed++;
 
   if(numberOfPlayers == people.completed)
   {
-    for(var j = 0; j < people.players.length; j++){
-      people.players[j].data.splice(-1,1);
-      people.players[j].data.splice(0,1);
-      people.players[j].data = Object.assign({}, ...people.players[j].data);
+    for(var j = 0; j < players.length; j++){
+      players[j].data.splice(-1,1);
+      players[j].data.splice(0,1);
+      players[j].data = Object.assign({}, ...players[j].data);
     }
 
     retriveMatchesResults().then((matchesResults) => {
