@@ -99,7 +99,7 @@ async function retriveFilesNames() {
   if(!res.ok) { return Promise.reject("Can not get files_names")}
 
   const filesNamesStr = await res.text();
-  const filesNames = filesNamesStr.split('\n');
+  const filesNames = filesNamesStr.trim().split('\n');
 
   return filesNames;
 }
