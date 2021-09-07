@@ -71,11 +71,6 @@ function processData(person, csvString) {
   }
 }
 
-var ajaxConfig = {
-  type: "GET",
-  dataType: "text",
-}
-
 async function fillFilesNames(filesNames) {
   filesNames.forEach(async (fileName) => {
     const csv = await retrivePlayerPredictions(fileName);
