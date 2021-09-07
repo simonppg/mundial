@@ -1,5 +1,5 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-var people = JSON.parse('{"players":[], "total": -1, "completed": 0, "results": 0}');
+var people = JSON.parse('{"players":[], "completed": 0, "results": 0}');
 var myTable = $('#myTable').DataTable({
   searching: false,
   paging: false,
@@ -50,13 +50,13 @@ function getResults(csvString) {
   })
 }
 
-function processData(person, csvString) {
+function processData(numberOfPlayers, person, csvString) {
   var playerData = Papa.parse(csvString);
   playerData.data = playerData.data.map(mapper);
   people.players.push({name: person.name, data: playerData.data, points: 0});
   people.completed++;
 
-  if(people.total == people.completed)
+  if(numberOfPlayers == people.completed)
   {
     for(var j = 0; j < people.players.length; j++){
       people.players[j].data.splice(-1,1);
@@ -71,15 +71,16 @@ function processData(person, csvString) {
 }
 
 async function fillFilesNames(filesNames) {
+  const numberOfPlayers = filesNames.length;
+
   filesNames.forEach(async (fileName) => {
     const csv = await retrivePlayerPredictions(fileName);
 
     let person = new Object();
     person.name = fileName;
-    processData(person, csv)
+    processData(numberOfPlayers, person, csv)
   })
 
-  people.total = filesNames.length;
   console.log(people);
 }
 
