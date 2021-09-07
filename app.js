@@ -76,9 +76,7 @@ var ajaxConfig = {
   dataType: "text",
 }
 
-function fillFilesNames(filesNamesStr) {
-  let filesNames = filesNamesStr.split('\n');
-
+function fillFilesNames(filesNames) {
   for(let i = 0; i < filesNames.length - 1; i++) {
     let person = new Object();
     person.name = filesNames[i];
@@ -92,12 +90,16 @@ function fillFilesNames(filesNamesStr) {
   console.log(people);
 }
 
+/**
+ * @returns filesNames: An array of string with the files names
+  * */
 async function retriveFilesNames() {
   const res = await fetch(URL_PATH + "files_names.txt");
 
   if(!res.ok) { return Promise.reject("Can not get files_names")}
 
-  const filesNames = await res.text();
+  const filesNamesStr = await res.text();
+  const filesNames = filesNamesStr.split('\n');
 
   return filesNames;
 }
