@@ -77,16 +77,17 @@ var ajaxConfig = {
 }
 
 function fillFilesNames(filesNames) {
-  for(let i = 0; i < filesNames.length - 1; i++) {
+  for(let i = 0; i < filesNames.length; i++) {
+    const fileName = filesNames[i];
     let person = new Object();
-    person.name = filesNames[i];
-    ajaxConfig.url = URL_PATH.concat(filesNames[i]).concat(".csv");
+    person.name = fileName;
+    ajaxConfig.url = URL_PATH + fileName + ".csv";
     ajaxConfig.success = processData;
     ajaxConfig.context = person;
     $.ajax(ajaxConfig)
   }
 
-  people.total = filesNames.length - 1;
+  people.total = filesNames.length;
   console.log(people);
 }
 
