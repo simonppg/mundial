@@ -51,10 +51,10 @@ function getResults(csvString) {
   }
 }
 
-function processData(csvString) {
+function processData(person, csvString) {
   var playerData = Papa.parse(csvString);
   playerData.data = playerData.data.map(mapper);
-  people.players.push({name: this.name, data: playerData.data, points: 0});
+  people.players.push({name: person.name, data: playerData.data, points: 0});
   people.completed++;
 
   if(people.total == people.completed)
@@ -76,16 +76,14 @@ var ajaxConfig = {
   dataType: "text",
 }
 
-function fillFilesNames(filesNames) {
-  for(let i = 0; i < filesNames.length; i++) {
-    const fileName = filesNames[i];
+async function fillFilesNames(filesNames) {
+  filesNames.forEach(async (fileName) => {
+    const csv = await retrivePlayerPredictions(fileName);
+
     let person = new Object();
     person.name = fileName;
-    ajaxConfig.url = URL_PATH + fileName + ".csv";
-    ajaxConfig.success = processData;
-    ajaxConfig.context = person;
-    $.ajax(ajaxConfig)
-  }
+    processData(person, csv)
+  })
 
   people.total = filesNames.length;
   console.log(people);
@@ -102,6 +100,19 @@ async function retriveMatchesResults() {
   const matchesResults = await res.text();
   // console.log(matchesResults);
   return matchesResults;
+}
+
+/**
+ * @returns playersPredictions player predictions
+ * */
+async function retrivePlayerPredictions(fileName) {
+  const res = await fetch(URL_PATH + fileName + ".csv");
+
+  if(!res.ok) { return Promise.reject("Can not get " + fileName) }
+
+  const playersPredictions= await res.text();
+  // console.log(playersPredictions);
+  return playersPredictions;
 }
 
 /**
