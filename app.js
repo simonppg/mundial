@@ -35,20 +35,19 @@ function getResults(csvString) {
   addResults(people.results);
 
   for (var match in people.results) {
-    console.log("Result of "+match+" is: "+people.results[match]);
-    for(var j = 0; j < people.players.length; j++){
-      console.log(people.players[j].name+" said: "+people.players[j].data[match]);
-      if(people.results[match].toUpperCase() === people.players[j].data[match].toUpperCase())
-      {
-        console.log('%cOne point for '+people.players[j].name+'!', 'color: #ff0000');
-        people.players[j].points++;
+    console.log("Result of " + match + " is: " + people.results[match]);
+    people.players.forEach((player) => {
+      console.log(player.name + " said: " + player.data[match]);
+      if(people.results[match].toUpperCase() === player.data[match].toUpperCase()) {
+        console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
+        player.points++;
       }
-    }
+    })
   }
 
-  for(var j = 0; j < people.players.length; j++){
-    addPlayer(people.players[j].name, people.players[j].points);
-  }
+  people.players.forEach((player) => {
+    addPlayer(player.name, player.points);
+  })
 }
 
 function processData(person, csvString) {
