@@ -51,10 +51,10 @@ function getResults(csvString) {
   }
 }
 
-function processData(csvString) {
+function processData(person, csvString) {
   var playerData = Papa.parse(csvString);
   playerData.data = playerData.data.map(mapper);
-  people.players.push({name: this.name, data: playerData.data, points: 0});
+  people.players.push({name: person.name, data: playerData.data, points: 0});
   people.completed++;
 
   if(people.total == people.completed)
@@ -64,41 +64,72 @@ function processData(csvString) {
       people.players[j].data.splice(0,1);
       people.players[j].data = Object.assign({}, ...people.players[j].data);
     }
-    // Get matches results
-    ajaxConfig.url = URL_PATH.concat("results.csv");
-    ajaxConfig.success = getResults;
-    $.ajax(ajaxConfig);
+
+    retriveMatchesResults().then((matchesResults) => {
+      getResults(matchesResults)
+    });
   }
 }
 
-var ajaxConfig = {
-  type: "GET",
-  dataType: "text",
-}
+async function fillFilesNames(filesNames) {
+  filesNames.forEach(async (fileName) => {
+    const csv = await retrivePlayerPredictions(fileName);
 
-function fillFilesNames(filesNamesStr) {
-  let filesNames = filesNamesStr.split('\n');
-
-  for(let i = 0; i < filesNames.length - 1; i++) {
     let person = new Object();
-    person.name = filesNames[i];
-    ajaxConfig.url = URL_PATH.concat(filesNames[i]).concat(".csv");
-    ajaxConfig.success = processData;
-    ajaxConfig.context = person;
-    $.ajax(ajaxConfig)
-  }
+    person.name = fileName;
+    processData(person, csv)
+  })
 
-  people.total = filesNames.length - 1;
+  people.total = filesNames.length;
   console.log(people);
 }
 
-var main = function() {
-  $.ajax({
-    type: "GET",
-    url: URL_PATH.concat("files_names.txt"),
-    dataType: "text",
-    success: fillFilesNames
-  });
+/**
+ * @returns matchesResults final results
+ * */
+async function retriveMatchesResults() {
+  const res = await fetch(URL_PATH + "results.csv");
+
+  if(!res.ok) { return Promise.reject("Can not get results.csv") }
+
+  const matchesResults = await res.text();
+  // console.log(matchesResults);
+  return matchesResults;
+}
+
+/**
+ * @returns playersPredictions player predictions
+ * */
+async function retrivePlayerPredictions(fileName) {
+  const res = await fetch(URL_PATH + fileName + ".csv");
+
+  if(!res.ok) { return Promise.reject("Can not get " + fileName) }
+
+  const playersPredictions= await res.text();
+  // console.log(playersPredictions);
+  return playersPredictions;
+}
+
+/**
+ * @returns filesNames: An array of string with the files names
+  * */
+async function retriveFilesNames() {
+  const res = await fetch(URL_PATH + "files_names.txt");
+
+  if(!res.ok) { return Promise.reject("Can not get files_names")}
+
+  const filesNamesStr = await res.text();
+  const filesNames = filesNamesStr.trim().split('\n');
+
+  return filesNames;
+}
+
+var main = async function() {
+  const filesNames = await retriveFilesNames();
+
+  console.log(filesNames);
+
+  fillFilesNames(filesNames);
 }
 
 $(document).ready(main);
