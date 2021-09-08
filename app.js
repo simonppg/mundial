@@ -8,6 +8,7 @@ function mapper(a){
 
 function findTable() {
   return $('#myTable').DataTable({
+    order: [[ 1, "desc" ]],
     searching: false,
     paging: false,
     info: false
