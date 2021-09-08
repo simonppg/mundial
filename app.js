@@ -1,5 +1,6 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-var people = JSON.parse('{"players":[], "total": -1, "completed": 0, "results": 0}');
+let players = [];
+let completed = 0;
 var myTable = $('#myTable').DataTable({
   searching: false,
   paging: false,
@@ -19,69 +20,67 @@ function addPlayer(playerName, points) {
   ]).draw( false );
 }
 
-function addResults(results) {
+function showResults(results) {
   $.each(results, function(match, result) {
     var span = $("#"+match.replace(/\s/g, ''));
     span.text(result);
   });
 }
 
-function getResults(csvString) {
-  var matchResults = Papa.parse(csvString);
-  matchResults.data.splice(-1,1);
-  matchResults.data.splice(0,1);
-  people.results = matchResults.data.map(mapper);
-  people.results = Object.assign({}, ...people.results);
-  addResults(people.results);
-
-  for (var match in people.results) {
-    console.log("Result of "+match+" is: "+people.results[match]);
-    for(var j = 0; j < people.players.length; j++){
-      console.log(people.players[j].name+" said: "+people.players[j].data[match]);
-      if(people.results[match].toUpperCase() === people.players[j].data[match].toUpperCase())
-      {
-        console.log('%cOne point for '+people.players[j].name+'!', 'color: #ff0000');
-        people.players[j].points++;
+function calculateScore(matchesResults) {
+  for (let match in matchesResults) {
+    console.log("Result of " + match + " is: " + matchesResults[match]);
+    players.forEach((player) => {
+      console.log(player.name + " said: " + player.data[match]);
+      if(matchesResults[match].toUpperCase() === player.data[match].toUpperCase()) {
+        console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
+        player.points++;
       }
-    }
+    })
   }
 
-  for(var j = 0; j < people.players.length; j++){
-    addPlayer(people.players[j].name, people.players[j].points);
-  }
+  players.forEach((player) => {
+    addPlayer(player.name, player.points);
+  })
 }
 
-function processData(person, csvString) {
-  var playerData = Papa.parse(csvString);
-  playerData.data = playerData.data.map(mapper);
-  people.players.push({name: person.name, data: playerData.data, points: 0});
-  people.completed++;
+async function processData(numberOfPlayers, player, playersPredictions) {
+  players.push({name: player.name, data: playersPredictions, points: 0});
+  completed++;
 
-  if(people.total == people.completed)
-  {
-    for(var j = 0; j < people.players.length; j++){
-      people.players[j].data.splice(-1,1);
-      people.players[j].data.splice(0,1);
-      people.players[j].data = Object.assign({}, ...people.players[j].data);
+  if (numberOfPlayers == completed) {
+    for (var j = 0; j < players.length; j++) {
+      players[j].data.splice(-1, 1);
+      players[j].data.splice(0, 1);
+      players[j].data = Object.assign({}, ...players[j].data);
     }
 
-    retriveMatchesResults().then((matchesResults) => {
-      getResults(matchesResults)
-    });
+    const matchesResults = await retriveMatchesResults()
+    showResults(matchesResults);
+    calculateScore(matchesResults)
   }
 }
 
 async function fillFilesNames(filesNames) {
+  const numberOfPlayers = filesNames.length;
+
   filesNames.forEach(async (fileName) => {
-    const csv = await retrivePlayerPredictions(fileName);
+    const playerPredictions = await retrivePlayerPredictions(fileName);
 
-    let person = new Object();
-    person.name = fileName;
-    processData(person, csv)
+    let player = new Object();
+    player.name = fileName;
+    processData(numberOfPlayers, player, playerPredictions)
   })
+}
 
-  people.total = filesNames.length;
-  console.log(people);
+function parseCsv(csvStr){
+  const parsedData = Papa.parse(csvStr);
+
+  if(parsedData.errors.length > 0) {
+    throw new Error("Can not parse csv")
+  }
+
+  return parsedData.data;
 }
 
 /**
@@ -92,8 +91,15 @@ async function retriveMatchesResults() {
 
   if(!res.ok) { return Promise.reject("Can not get results.csv") }
 
-  const matchesResults = await res.text();
-  // console.log(matchesResults);
+  const responseStr = await res.text();
+  
+  const parsedResult = parseCsv(responseStr)
+
+  parsedResult.splice(-1,1);
+  parsedResult.splice(0,1);
+
+  let matchesResults = parsedResult.map(mapper);
+  matchesResults = Object.assign({}, ...matchesResults);
   return matchesResults;
 }
 
@@ -105,8 +111,11 @@ async function retrivePlayerPredictions(fileName) {
 
   if(!res.ok) { return Promise.reject("Can not get " + fileName) }
 
-  const playersPredictions= await res.text();
-  // console.log(playersPredictions);
+  const responseStr = await res.text();
+
+  const parsedResult = parseCsv(responseStr);
+  const playersPredictions = parsedResult.map(mapper);
+
   return playersPredictions;
 }
 
