@@ -97,7 +97,8 @@ async function main() {
   const filesNames = await retriveFilesNames();
   const numberOfPlayers = filesNames.length;
 
-  console.log(filesNames);
+  const matchesResults = await retriveMatchesResults()
+  showResults(matchesResults);
 
   filesNames.forEach(async (fileName) => {
     const playerPredictions = await retrivePlayerPredictions(fileName);
@@ -114,9 +115,6 @@ async function main() {
         players[j].data.splice(0, 1);
         players[j].data = Object.assign({}, ...players[j].data);
       }
-
-      const matchesResults = await retriveMatchesResults()
-      showResults(matchesResults);
 
       for (let match in matchesResults) {
         console.log("Result of " + match + " is: " + matchesResults[match]);
