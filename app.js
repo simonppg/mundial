@@ -126,9 +126,10 @@ async function main() {
         })
       }
 
-      showPlayers(players);
     }
   }
+
+  showPlayers(players);
 }
 
 $(document).ready(main);
