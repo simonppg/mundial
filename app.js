@@ -98,13 +98,14 @@ async function retriveFilesNames() {
 async function main() {
   let players = [];
   let completed = 0;
+
   const filesNames = await retriveFilesNames();
   const numberOfPlayers = filesNames.length;
 
   const matchesResults = await retriveMatchesResults()
   showResults(matchesResults);
 
-  filesNames.forEach(async (fileName) => {
+  for (const fileName of filesNames) {
     const playerPredictions = await retrivePlayerPredictions(fileName);
 
     let player = new Object();
@@ -127,7 +128,7 @@ async function main() {
 
       showPlayers(players);
     }
-  })
+  }
 }
 
 $(document).ready(main);
