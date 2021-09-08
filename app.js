@@ -118,7 +118,6 @@ async function main() {
 
     const player = {
       name: fileName,
-      predictions,
       points
     };
 
