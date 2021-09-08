@@ -31,48 +31,6 @@ function showResults(results) {
   });
 }
 
-function calculateScore(matchesResults, players) {
-  for (let match in matchesResults) {
-    console.log("Result of " + match + " is: " + matchesResults[match]);
-    players.forEach((player) => {
-      console.log(player.name + " said: " + player.data[match]);
-      if(matchesResults[match].toUpperCase() === player.data[match].toUpperCase()) {
-        console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
-        player.points++;
-      }
-    })
-  }
-}
-
-async function fillFilesNames(filesNames) {
-  let players = [];
-  let completed = 0;
-  const numberOfPlayers = filesNames.length;
-
-  filesNames.forEach(async (fileName) => {
-    const playerPredictions = await retrivePlayerPredictions(fileName);
-
-    let player = new Object();
-    player.name = fileName;
-
-    players.push({name: player.name, data: playerPredictions, points: 0});
-    completed++;
-
-    if (numberOfPlayers == completed) {
-      for (var j = 0; j < players.length; j++) {
-        players[j].data.splice(-1, 1);
-        players[j].data.splice(0, 1);
-        players[j].data = Object.assign({}, ...players[j].data);
-      }
-
-      const matchesResults = await retriveMatchesResults()
-      showResults(matchesResults);
-      calculateScore(matchesResults, players)
-      showPlayers(players);
-    }
-  })
-}
-
 function parseCsv(csvStr){
   const parsedData = Papa.parse(csvStr);
 
@@ -133,12 +91,47 @@ async function retriveFilesNames() {
   return filesNames;
 }
 
-var main = async function() {
+async function main() {
+  let players = [];
+  let completed = 0;
   const filesNames = await retriveFilesNames();
+  const numberOfPlayers = filesNames.length;
 
   console.log(filesNames);
 
-  fillFilesNames(filesNames);
+  filesNames.forEach(async (fileName) => {
+    const playerPredictions = await retrivePlayerPredictions(fileName);
+
+    let player = new Object();
+    player.name = fileName;
+
+    players.push({name: player.name, data: playerPredictions, points: 0});
+    completed++;
+
+    if (numberOfPlayers == completed) {
+      for (var j = 0; j < players.length; j++) {
+        players[j].data.splice(-1, 1);
+        players[j].data.splice(0, 1);
+        players[j].data = Object.assign({}, ...players[j].data);
+      }
+
+      const matchesResults = await retriveMatchesResults()
+      showResults(matchesResults);
+
+      for (let match in matchesResults) {
+        console.log("Result of " + match + " is: " + matchesResults[match]);
+        players.forEach((player) => {
+          console.log(player.name + " said: " + player.data[match]);
+          if (matchesResults[match].toUpperCase() === player.data[match].toUpperCase()) {
+            console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
+            player.points++;
+          }
+        })
+      }
+
+      showPlayers(players);
+    }
+  })
 }
 
 $(document).ready(main);
