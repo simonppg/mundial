@@ -72,9 +72,13 @@ async function retrivePlayerPredictions(fileName) {
   const responseStr = await res.text();
 
   const parsedResult = parseCsv(responseStr);
-  const playersPredictions = parsedResult.map(mapper);
+  let playerPredictions = parsedResult.map(mapper);
 
-  return playersPredictions;
+  playerPredictions.splice(-1, 1);
+  playerPredictions.splice(0, 1);
+  playerPredictions = Object.assign({}, ...playerPredictions);
+
+  return playerPredictions;
 }
 
 /**
@@ -110,12 +114,6 @@ async function main() {
     completed++;
 
     if (numberOfPlayers == completed) {
-      for (var j = 0; j < players.length; j++) {
-        players[j].data.splice(-1, 1);
-        players[j].data.splice(0, 1);
-        players[j].data = Object.assign({}, ...players[j].data);
-      }
-
       for (let match in matchesResults) {
         console.log("Result of " + match + " is: " + matchesResults[match]);
         players.forEach((player) => {
