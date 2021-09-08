@@ -1,5 +1,4 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-let players = [];
 let completed = 0;
 var myTable = $('#myTable').DataTable({
   searching: false,
@@ -46,25 +45,8 @@ function calculateScore(matchesResults, players) {
   }
 }
 
-async function processData(numberOfPlayers, player, playersPredictions) {
-  players.push({name: player.name, data: playersPredictions, points: 0});
-  completed++;
-
-  if (numberOfPlayers == completed) {
-    for (var j = 0; j < players.length; j++) {
-      players[j].data.splice(-1, 1);
-      players[j].data.splice(0, 1);
-      players[j].data = Object.assign({}, ...players[j].data);
-    }
-
-    const matchesResults = await retriveMatchesResults()
-    showResults(matchesResults);
-    calculateScore(matchesResults, players)
-    showPlayers(players);
-  }
-}
-
 async function fillFilesNames(filesNames) {
+  let players = [];
   const numberOfPlayers = filesNames.length;
 
   filesNames.forEach(async (fileName) => {
@@ -72,7 +54,22 @@ async function fillFilesNames(filesNames) {
 
     let player = new Object();
     player.name = fileName;
-    processData(numberOfPlayers, player, playerPredictions)
+
+    players.push({name: player.name, data: playerPredictions, points: 0});
+    completed++;
+
+    if (numberOfPlayers == completed) {
+      for (var j = 0; j < players.length; j++) {
+        players[j].data.splice(-1, 1);
+        players[j].data.splice(0, 1);
+        players[j].data = Object.assign({}, ...players[j].data);
+      }
+
+      const matchesResults = await retriveMatchesResults()
+      showResults(matchesResults);
+      calculateScore(matchesResults, players)
+      showPlayers(players);
+    }
   })
 }
 
