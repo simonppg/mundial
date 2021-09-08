@@ -13,11 +13,17 @@ function mapper(a){
   return myObj;
 }
 
-function addPlayer(playerName, points) {
+function showPlayer(playerName, points) {
   myTable.row.add([
     playerName,
     points
   ]).draw( false );
+}
+
+function showPlayers(players) {
+  players.forEach((player) => {
+    showPlayer(player.name, player.points);
+  });
 }
 
 function showResults(results) {
@@ -38,10 +44,6 @@ function calculateScore(matchesResults) {
       }
     })
   }
-
-  players.forEach((player) => {
-    addPlayer(player.name, player.points);
-  })
 }
 
 async function processData(numberOfPlayers, player, playersPredictions) {
@@ -58,6 +60,7 @@ async function processData(numberOfPlayers, player, playersPredictions) {
     const matchesResults = await retriveMatchesResults()
     showResults(matchesResults);
     calculateScore(matchesResults)
+    showPlayers(players);
   }
 }
 
