@@ -20,16 +20,14 @@ function addPlayer(playerName, points) {
   ]).draw( false );
 }
 
-function addResults(results) {
+function showResults(results) {
   $.each(results, function(match, result) {
     var span = $("#"+match.replace(/\s/g, ''));
     span.text(result);
   });
 }
 
-function getResults(matchesResults) {
-  addResults(matchesResults);
-
+function calculateScore(matchesResults) {
   for (let match in matchesResults) {
     console.log("Result of " + match + " is: " + matchesResults[match]);
     players.forEach((player) => {
@@ -46,21 +44,20 @@ function getResults(matchesResults) {
   })
 }
 
-function processData(numberOfPlayers, player, playersPredictions) {
+async function processData(numberOfPlayers, player, playersPredictions) {
   players.push({name: player.name, data: playersPredictions, points: 0});
   completed++;
 
-  if(numberOfPlayers == completed)
-  {
-    for(var j = 0; j < players.length; j++){
-      players[j].data.splice(-1,1);
-      players[j].data.splice(0,1);
+  if (numberOfPlayers == completed) {
+    for (var j = 0; j < players.length; j++) {
+      players[j].data.splice(-1, 1);
+      players[j].data.splice(0, 1);
       players[j].data = Object.assign({}, ...players[j].data);
     }
 
-    retriveMatchesResults().then((matchesResults) => {
-      getResults(matchesResults)
-    });
+    const matchesResults = await retriveMatchesResults()
+    showResults(matchesResults);
+    calculateScore(matchesResults)
   }
 }
 
