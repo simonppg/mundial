@@ -120,13 +120,13 @@ async function main() {
     if (numberOfPlayers == completed) {
       for (let match in matchesResults) {
         console.log("Result of " + match + " is: " + matchesResults[match]);
-        players.forEach((player) => {
+        for(const player of players) {
           console.log(player.name + " said: " + player.predictions[match]);
           if (matchesResults[match].toUpperCase() === player.predictions[match].toUpperCase()) {
             console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
             player.points++;
           }
-        })
+        }
       }
     }
   }
