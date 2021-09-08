@@ -11,17 +11,13 @@ function mapper(a){
   return myObj;
 }
 
-function showPlayer(playerName, points) {
-  myTable.row.add([
-    playerName,
-    points
-  ]).draw( false );
-}
-
 function showPlayers(players) {
-  players.forEach((player) => {
-    showPlayer(player.name, player.points);
-  });
+  for (const player of players) {
+    myTable.row.add([
+      player.name,
+      player.points
+    ]).draw(false);
+  }
 }
 
 function showResults(results) {
