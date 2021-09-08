@@ -97,10 +97,8 @@ async function retriveFilesNames() {
 
 async function main() {
   let players = [];
-  let completed = 0;
 
   const filesNames = await retriveFilesNames();
-  const numberOfPlayers = filesNames.length;
 
   const matchesResults = await retriveMatchesResults()
   showResults(matchesResults);
@@ -114,21 +112,16 @@ async function main() {
       points: 0
     };
 
-    players.push(player);
-    completed++;
-
-    if (numberOfPlayers == completed) {
-      for (let match in matchesResults) {
-        console.log("Result of " + match + " is: " + matchesResults[match]);
-        for(const player of players) {
-          console.log(player.name + " said: " + player.predictions[match]);
-          if (matchesResults[match].toUpperCase() === player.predictions[match].toUpperCase()) {
-            console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
-            player.points++;
-          }
-        }
+    for (let match in matchesResults) {
+      console.log("Result of " + match + " is: " + matchesResults[match]);
+      console.log(player.name + " said: " + player.predictions[match]);
+      if (matchesResults[match].toUpperCase() === player.predictions[match].toUpperCase()) {
+        console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
+        player.points++;
       }
     }
+
+    players.push(player);
   }
 
   showPlayers(players);
