@@ -6,19 +6,19 @@ function mapper(a){
   return myObj;
 }
 
-function showPlayers(players) {
-  var myTable = $('#myTable').DataTable({
+function findTable() {
+  return $('#myTable').DataTable({
     searching: false,
     paging: false,
     info: false
   });
+}
 
-  for (const player of players) {
-    myTable.row.add([
-      player.name,
-      player.points
-    ]).draw(false);
-  }
+function showPlayerPoints(table, name, points) {
+  table.row.add([
+    name,
+    points
+  ]).draw(false);
 }
 
 function showResults(results) {
@@ -112,8 +112,7 @@ function calculatePoints(matchesResults, predictions) {
 }
 
 async function main() {
-  let players = [];
-
+  const table = findTable();
   const filesNames = await retriveFilesNames();
   const matchesResults = await retriveMatchesResults()
 
@@ -123,13 +122,8 @@ async function main() {
     const predictions = await retrivePlayerPredictions(fileName);
     let points = calculatePoints(matchesResults, predictions);
 
-    players.push({
-      name: fileName,
-      points
-    });
+    showPlayerPoints(table, fileName, points);
   }
-
-  showPlayers(players);
 }
 
 $(document).ready(main);
