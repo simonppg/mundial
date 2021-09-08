@@ -95,6 +95,10 @@ async function retriveFilesNames() {
   return filesNames;
 }
 
+function isSameResult(matchResult, matchPrediction) {
+  return matchResult.toUpperCase() === matchPrediction.toUpperCase();
+}
+
 async function main() {
   let players = [];
 
@@ -110,7 +114,7 @@ async function main() {
     for (let match in matchesResults) {
       console.log("Result of " + match + " is: " + matchesResults[match]);
       console.log(fileName + " said: " + predictions[match]);
-      if (matchesResults[match].toUpperCase() === predictions[match].toUpperCase()) {
+      if (isSameResult(matchesResults[match], predictions[match])) {
         console.log('%cOne point for ' + fileName + '!', 'color: #ff0000');
         points++;
       }
