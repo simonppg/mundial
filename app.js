@@ -103,20 +103,20 @@ async function main() {
   let players = [];
 
   const filesNames = await retriveFilesNames();
-
   const matchesResults = await retriveMatchesResults()
+
   showResults(matchesResults);
 
   for (const fileName of filesNames) {
     const predictions = await retrivePlayerPredictions(fileName);
     let points = 0;
 
-    for (let match in matchesResults) {
-      console.log("Result of " + match + " is: " + matchesResults[match]);
-      console.log(fileName + " said: " + predictions[match]);
-      if (isSameResult(matchesResults[match], predictions[match])) {
-        console.log('%cOne point for ' + fileName + '!', 'color: #ff0000');
-        points++;
+    for (let matchIndex in matchesResults) {
+      const matchResult = matchesResults[matchIndex];
+      const matchPrediction = predictions[matchIndex];
+
+      if (isSameResult(matchResult, matchPrediction)) {
+        points += 1;
       }
     }
 
