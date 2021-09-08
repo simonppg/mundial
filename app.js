@@ -1,11 +1,4 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-let players = [];
-let completed = 0;
-var myTable = $('#myTable').DataTable({
-  searching: false,
-  paging: false,
-  info: false
-});
 
 function mapper(a){
   var myObj = new Object();
@@ -13,11 +6,19 @@ function mapper(a){
   return myObj;
 }
 
-function addPlayer(playerName, points) {
-  myTable.row.add([
-    playerName,
-    points
-  ]).draw( false );
+function showPlayers(players) {
+  var myTable = $('#myTable').DataTable({
+    searching: false,
+    paging: false,
+    info: false
+  });
+
+  for (const player of players) {
+    myTable.row.add([
+      player.name,
+      player.points
+    ]).draw(false);
+  }
 }
 
 function showResults(results) {
@@ -25,52 +26,6 @@ function showResults(results) {
     var span = $("#"+match.replace(/\s/g, ''));
     span.text(result);
   });
-}
-
-function calculateScore(matchesResults) {
-  for (let match in matchesResults) {
-    console.log("Result of " + match + " is: " + matchesResults[match]);
-    players.forEach((player) => {
-      console.log(player.name + " said: " + player.data[match]);
-      if(matchesResults[match].toUpperCase() === player.data[match].toUpperCase()) {
-        console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
-        player.points++;
-      }
-    })
-  }
-
-  players.forEach((player) => {
-    addPlayer(player.name, player.points);
-  })
-}
-
-async function processData(numberOfPlayers, player, playersPredictions) {
-  players.push({name: player.name, data: playersPredictions, points: 0});
-  completed++;
-
-  if (numberOfPlayers == completed) {
-    for (var j = 0; j < players.length; j++) {
-      players[j].data.splice(-1, 1);
-      players[j].data.splice(0, 1);
-      players[j].data = Object.assign({}, ...players[j].data);
-    }
-
-    const matchesResults = await retriveMatchesResults()
-    showResults(matchesResults);
-    calculateScore(matchesResults)
-  }
-}
-
-async function fillFilesNames(filesNames) {
-  const numberOfPlayers = filesNames.length;
-
-  filesNames.forEach(async (fileName) => {
-    const playerPredictions = await retrivePlayerPredictions(fileName);
-
-    let player = new Object();
-    player.name = fileName;
-    processData(numberOfPlayers, player, playerPredictions)
-  })
 }
 
 function parseCsv(csvStr){
@@ -114,9 +69,13 @@ async function retrivePlayerPredictions(fileName) {
   const responseStr = await res.text();
 
   const parsedResult = parseCsv(responseStr);
-  const playersPredictions = parsedResult.map(mapper);
+  let playerPredictions = parsedResult.map(mapper);
 
-  return playersPredictions;
+  playerPredictions.splice(-1, 1);
+  playerPredictions.splice(0, 1);
+  playerPredictions = Object.assign({}, ...playerPredictions);
+
+  return playerPredictions;
 }
 
 /**
@@ -133,12 +92,45 @@ async function retriveFilesNames() {
   return filesNames;
 }
 
-var main = async function() {
+function isSameResult(matchResult, matchPrediction) {
+  return matchResult.toUpperCase() === matchPrediction.toUpperCase();
+}
+
+function calculatePoints(matchesResults, predictions) {
+  let points = 0;
+
+  for (const matchIndex in matchesResults) {
+    const matchResult = matchesResults[matchIndex];
+    const matchPrediction = predictions[matchIndex];
+
+    if (isSameResult(matchResult, matchPrediction)) {
+      points += 1;
+    }
+  }
+
+  return points;
+}
+
+async function main() {
+  let players = [];
+
   const filesNames = await retriveFilesNames();
+  const matchesResults = await retriveMatchesResults()
 
-  console.log(filesNames);
+  showResults(matchesResults);
 
-  fillFilesNames(filesNames);
+  for (const fileName of filesNames) {
+    const predictions = await retrivePlayerPredictions(fileName);
+    let points = calculatePoints(matchesResults, predictions);
+
+    players.push({
+      name: fileName,
+      points
+    });
+  }
+
+  showPlayers(players);
 }
 
 $(document).ready(main);
+
