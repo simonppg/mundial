@@ -1,5 +1,4 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-let completed = 0;
 var myTable = $('#myTable').DataTable({
   searching: false,
   paging: false,
@@ -47,6 +46,7 @@ function calculateScore(matchesResults, players) {
 
 async function fillFilesNames(filesNames) {
   let players = [];
+  let completed = 0;
   const numberOfPlayers = filesNames.length;
 
   filesNames.forEach(async (fileName) => {
