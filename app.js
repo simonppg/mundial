@@ -105,21 +105,22 @@ async function main() {
 
   for (const fileName of filesNames) {
     const predictions = await retrivePlayerPredictions(fileName);
+    let points = 0;
+
+    for (let match in matchesResults) {
+      console.log("Result of " + match + " is: " + matchesResults[match]);
+      console.log(fileName + " said: " + predictions[match]);
+      if (matchesResults[match].toUpperCase() === predictions[match].toUpperCase()) {
+        console.log('%cOne point for ' + fileName + '!', 'color: #ff0000');
+        points++;
+      }
+    }
 
     const player = {
       name: fileName,
       predictions,
-      points: 0
+      points
     };
-
-    for (let match in matchesResults) {
-      console.log("Result of " + match + " is: " + matchesResults[match]);
-      console.log(player.name + " said: " + player.predictions[match]);
-      if (matchesResults[match].toUpperCase() === player.predictions[match].toUpperCase()) {
-        console.log('%cOne point for ' + player.name + '!', 'color: #ff0000');
-        player.points++;
-      }
-    }
 
     players.push(player);
   }
