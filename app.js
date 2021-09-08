@@ -33,7 +33,7 @@ function showResults(results) {
   });
 }
 
-function calculateScore(matchesResults) {
+function calculateScore(matchesResults, players) {
   for (let match in matchesResults) {
     console.log("Result of " + match + " is: " + matchesResults[match]);
     players.forEach((player) => {
@@ -59,7 +59,7 @@ async function processData(numberOfPlayers, player, playersPredictions) {
 
     const matchesResults = await retriveMatchesResults()
     showResults(matchesResults);
-    calculateScore(matchesResults)
+    calculateScore(matchesResults, players)
     showPlayers(players);
   }
 }
