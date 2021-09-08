@@ -95,6 +95,21 @@ function isSameResult(matchResult, matchPrediction) {
   return matchResult.toUpperCase() === matchPrediction.toUpperCase();
 }
 
+function calculatePoints(matchesResults, predictions) {
+  let points = 0;
+
+  for (const matchIndex in matchesResults) {
+    const matchResult = matchesResults[matchIndex];
+    const matchPrediction = predictions[matchIndex];
+
+    if (isSameResult(matchResult, matchPrediction)) {
+      points += 1;
+    }
+  }
+
+  return points;
+}
+
 async function main() {
   let players = [];
 
@@ -105,26 +120,16 @@ async function main() {
 
   for (const fileName of filesNames) {
     const predictions = await retrivePlayerPredictions(fileName);
-    let points = 0;
+    let points = calculatePoints(matchesResults, predictions);
 
-    for (let matchIndex in matchesResults) {
-      const matchResult = matchesResults[matchIndex];
-      const matchPrediction = predictions[matchIndex];
-
-      if (isSameResult(matchResult, matchPrediction)) {
-        points += 1;
-      }
-    }
-
-    const player = {
+    players.push({
       name: fileName,
       points
-    };
-
-    players.push(player);
+    });
   }
 
   showPlayers(players);
 }
 
 $(document).ready(main);
+
