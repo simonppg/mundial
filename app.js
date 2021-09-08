@@ -1,9 +1,4 @@
 const URL_PATH = "https://raw.githubusercontent.com/simonppg/mundial/master/";
-var myTable = $('#myTable').DataTable({
-  searching: false,
-  paging: false,
-  info: false
-});
 
 function mapper(a){
   var myObj = new Object();
@@ -12,6 +7,12 @@ function mapper(a){
 }
 
 function showPlayers(players) {
+  var myTable = $('#myTable').DataTable({
+    searching: false,
+    paging: false,
+    info: false
+  });
+
   for (const player of players) {
     myTable.row.add([
       player.name,
