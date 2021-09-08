@@ -27,13 +27,7 @@ function addResults(results) {
   });
 }
 
-function getResults(csvString) {
-  const parserResult = Papa.parse(csvString);
-  parserResult.data.splice(-1,1);
-  parserResult.data.splice(0,1);
-
-  let matchesResults = parserResult.data.map(mapper);
-  matchesResults = Object.assign({}, ...matchesResults);
+function getResults(matchesResults) {
   addResults(matchesResults);
 
   for (let match in matchesResults) {
@@ -52,10 +46,8 @@ function getResults(csvString) {
   })
 }
 
-function processData(numberOfPlayers, person, csvString) {
-  var playerData = Papa.parse(csvString);
-  playerData.data = playerData.data.map(mapper);
-  players.push({name: person.name, data: playerData.data, points: 0});
+function processData(numberOfPlayers, player, playersPredictions) {
+  players.push({name: player.name, data: playersPredictions, points: 0});
   completed++;
 
   if(numberOfPlayers == completed)
@@ -76,11 +68,11 @@ async function fillFilesNames(filesNames) {
   const numberOfPlayers = filesNames.length;
 
   filesNames.forEach(async (fileName) => {
-    const csv = await retrivePlayerPredictions(fileName);
+    const playerPredictions = await retrivePlayerPredictions(fileName);
 
-    let person = new Object();
-    person.name = fileName;
-    processData(numberOfPlayers, person, csv)
+    let player = new Object();
+    player.name = fileName;
+    processData(numberOfPlayers, player, playerPredictions)
   })
 }
 
@@ -102,8 +94,15 @@ async function retriveMatchesResults() {
 
   if(!res.ok) { return Promise.reject("Can not get results.csv") }
 
-  const matchesResults = await res.text();
-  // console.log(matchesResults);
+  const responseStr = await res.text();
+  
+  const parsedResult = parseCsv(responseStr)
+
+  parsedResult.splice(-1,1);
+  parsedResult.splice(0,1);
+
+  let matchesResults = parsedResult.map(mapper);
+  matchesResults = Object.assign({}, ...matchesResults);
   return matchesResults;
 }
 
@@ -115,8 +114,11 @@ async function retrivePlayerPredictions(fileName) {
 
   if(!res.ok) { return Promise.reject("Can not get " + fileName) }
 
-  const playersPredictions= await res.text();
-  // console.log(playersPredictions);
+  const responseStr = await res.text();
+
+  const parsedResult = parseCsv(responseStr);
+  const playersPredictions = parsedResult.map(mapper);
+
   return playersPredictions;
 }
 
